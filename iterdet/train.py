@@ -127,3 +127,46 @@ def train_detector(model,
     elif cfg.load_from:
         runner.load_checkpoint(cfg.load_from)
     runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+
+def main():
+    config = 'config.py'
+    work_dir = './train'
+    cfg = Config.fromfile(config)
+
+    mmcv.mkdir_or_exist(osp.abspath(work_dir))
+    timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
+    log_file = osp.join(work_dir, f'{timestamp}.log')
+    logger = get_root_logger(log_file=log_file, log_level=cfg.log_level)
+
+    meta = dict()
+    env_info_dict = collect_env()
+    env_info = '\n'.join([(f'{k}: {v}') for k, v in env_info_dict.items()])
+    dash_line = '-' * 60 + '\n'
+    logger.info('Environment info:\n' + dash_line + env_info + '\n' +
+                dash_line)
+    meta['env_info'] = env_info
+
+    model = build_detector(cfg.model, train_cfg=cfg.train_cfg, test_cfg=cfg.test_cfg)
+
+    datasets = [build_dataset(cfg.data.train)]
+    if len(cfg.workflow) == 2:
+        val_dataset = copy.deepcopy(cfg.data.val)
+        val_dataset.pipeline = cfg.data.train.pipeline
+        datasets.append(build_dataset(val_dataset))
+    if cfg.checkpoint_config is not None:
+        cfg.checkpoint_config.meta = dict(
+            mmdet_version=__version__,
+            config=cfg.pretty_text,
+            CLASSES=datasets[0].CLASSES)
+    model.CLASSES = datasets[0].CLASSES
+    train_detector(
+        model,
+        datasets,
+        cfg,
+        distributed=False,
+        validate=False,
+        timestamp=timestamp,
+        meta=meta)
+
+if __name__ == '__main__':
+    main()
