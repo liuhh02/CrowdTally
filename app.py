@@ -28,7 +28,7 @@ storage = firebase.storage()
 @st.cache(allow_output_mutation=True)
 def loadmodel():
   config = 'config.py'
-  checkpoint = 'https://github.com/saic-vul/iterdet/releases/download/v2.0.0/wider_person_faster_rcnn_r50_fpn_2x.pth'
+  checkpoint = './model.pth'
   model = init_detector(config, checkpoint, device='cuda:0')
   return model
 
@@ -138,7 +138,7 @@ def main():
         upload = st.button("Would you like to upload this image for others to view?")
         if upload:
           filename = uuid.uuid4()
-          storage.child(f"{filename}.jpg").put(f)
+          storage.child(f"{filename}.jfif").put(f)
           st.write("Success! Your image has been uploaded. Thank you for contributing to our crowdsourced database of images!")
     else:
       files = storage.list_files()
