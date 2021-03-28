@@ -115,6 +115,7 @@ def main():
   if (functionality == 'Count from Image'):
     st.subheader('Count from Image')
     choice = st.sidebar.selectbox('Choose your image', ('Upload my own image', 'Search for crowdsourced images'))
+	
     if choice == 'Upload my own image':
       f = st.file_uploader("Upload an image")
       if f is not None:
@@ -140,6 +141,7 @@ def main():
           filename = uuid.uuid4()
           storage.child(f"{filename}.jfif").put(f)
           st.write("Success! Your image has been uploaded. Thank you for contributing to our crowdsourced database of images!")
+	
     else:
       files = storage.list_files()
       url_list = []
@@ -189,8 +191,10 @@ def main():
         result_img = model.show_result(img, result, score_thr=confidence_threshold, show=False)
         st.write("**Annotated Image**")
         st.image(result_img, width=700)
+	
   elif functionality == 'Count from Live Video':
     model_type = st.sidebar.selectbox("Choose your model type", ("Best Precision (IterDet)", "Lightweight (YOLO)"))
+
     if model_type == "Best Precision (IterDet)":
       f = st.file_uploader("Upload a video")
       if f is not None:
@@ -212,6 +216,7 @@ def main():
           cv2.putText(new, text, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (135, 106, 26), 3)
           stframe.image(new, channels="BGR")
         stframe.empty()
+	
       elif model_type == "Lightweight (YOLO)":
         f = st.file_uploader("Upload a video")
         if f is not None:
