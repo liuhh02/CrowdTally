@@ -211,7 +211,6 @@ def main():
           text = f"{num} People Detected"
           cv2.putText(new, text, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (135, 106, 26), 3)
           stframe.image(new, channels="BGR")
-          time.sleep(0.3)
         stframe.empty()
       elif model_type == "Lightweight (YOLO)":
         f = st.file_uploader("Upload a video")
